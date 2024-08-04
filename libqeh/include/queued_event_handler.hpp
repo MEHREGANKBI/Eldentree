@@ -1,22 +1,27 @@
+#pragma once
 #include <string>
 
 namespace qeh {
 
 struct Event {
-  std::string m_message{};
-  Event* m_next{nullptr};
+  std::string message{};
+  Event* next{nullptr};
 };
 
 struct Queue {
-  std::string m_name{};
-  Event* m_first_event{nullptr};
-  Event* m_last_event{nullptr};
-  Queue* m_next{nullptr};
+  std::string name{};
+  Event* first_event{nullptr};
+  Event* last_event{nullptr};
+  Queue* next{nullptr};
 };
 
 struct QueueList {
-  Queue* m_first{nullptr};
-  Queue* m_last{nullptr};
+  Queue* first{nullptr};
+  Queue* last{nullptr};
+  Queue* queue_exists(const char* event_queue_pair) const;
 };
 
 }  // namespace qeh
+
+int32_t process_event_queue_pairs(const char* event_queue_pairs[],
+                                  qeh::QueueList* queue_list);
