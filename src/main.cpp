@@ -20,5 +20,7 @@ int main() {
   std::cout << process_event_queue_pairs(event_queue_pairs, queue_list)
             << std::endl;
 
+  queue_list->print_queues();
+
   return EXIT_SUCCESS;
 }
