@@ -16,6 +16,7 @@ struct Queue {
   Queue* next{nullptr};
 
   qeh::Event* add_event_to_queue(const char* event_queue_pair);
+  void print_events() const;
 };
 
 struct QueueList {
@@ -24,6 +25,7 @@ struct QueueList {
 
   Queue* queue_exists(const char* event_queue_pair) const;
   qeh::Queue* create_new_queue(const char* queue_name);
+  void print_queues() const;
 };
 
 }  // namespace qeh
