@@ -4,4 +4,10 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 project(Eldentree VERSION 1.0.0)
 
+add_subdirectory(libqeh/)
+
 add_executable(${CMAKE_PROJECT_NAME} src/main.cpp)
+target_link_libraries(${CMAKE_PROJECT_NAME} qeh)
+
+
+
