@@ -2,7 +2,15 @@
 
 #include <string.h>
 
+#include <chrono>
+#include <cstdint>
+#include <cstdlib>
 #include <iostream>
+#include <mutex>
+#include <thread>
+#include <vector>
+
+#define TIMES_RUN_EMPTY_LIMIT 10
 
 qeh::Queue* qeh::QueueList::queue_exists(const char* event_queue_pair) const {
   std::cout << event_queue_pair << std::endl;
@@ -104,4 +112,73 @@ int32_t process_event_queue_pairs(const char* event_queue_pairs[],
     events_added += 1;
   }
   return events_added;
+}
+
+void default_worker_handler(qeh::QueueList* queue_list, int32_t thread_id) {
+  // Invalid state.
+  if ((queue_list->first == nullptr) || (queue_list->last == nullptr)) {
+    std::abort();
+  }
+  static int32_t empty_queue_faced{};
+  static std::mutex qeh_lock;
+  static qeh::Queue* current_queue{queue_list->first};
+  qeh::Event* current_event{nullptr};
+  while (true) {
+    // if all queues have been empty for a while, stop checking.
+    // no lock needed.
+    if (empty_queue_faced > TIMES_RUN_EMPTY_LIMIT) break;
+
+    qeh_lock.lock();
+    abort_if_nullptr(current_queue, "null queue ptr faced.");
+
+    // if queue has no more events.
+    if ((current_queue->first_event == nullptr) ||
+        (current_queue->last_event == nullptr)) {
+      // skip current queue.
+      if (current_queue->next == nullptr) {
+        current_queue = queue_list->first;
+      } else {
+        current_queue = current_queue->next;
+      }
+      empty_queue_faced += 1;
+      qeh_lock.unlock();
+      continue;
+    }
+
+    current_event = current_queue->first_event;
+    std::cout << "thread " << thread_id
+              << " handled: " << current_event->message << std::endl;
+    // if there's only one more event remaining.
+    if (current_queue->first_event == current_queue->last_event) {
+      current_queue->first_event = nullptr;
+      current_queue->last_event = nullptr;
+    } else {
+      current_queue->first_event = current_event->next;
+    }
+    delete current_event;
+
+    // move to the next queue
+    if (current_queue->next == nullptr) {
+      current_queue = queue_list->first;
+    } else {
+      current_queue = current_queue->next;
+    }
+    qeh_lock.unlock();
+    std::this_thread::sleep_for(std::chrono::milliseconds(234));
+  }
+}
+
+void handle_all_events(qeh::QueueList* queue_list, int32_t worker_count) {
+  std::vector<std::thread*> worker_ptrs{};
+  for (int32_t id = 0; id < worker_count; ++id) {
+    std::thread* new_thread{
+        new std::thread{default_worker_handler, queue_list, id}};
+    abort_if_nullptr(new_thread, "Failed to create a thread.");
+    worker_ptrs.push_back(new_thread);
+  }
+
+  for (std::thread* thread_ptr : worker_ptrs) {
+    thread_ptr->join();
+    delete thread_ptr;
+  }
 }

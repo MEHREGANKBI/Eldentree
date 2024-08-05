@@ -40,3 +40,5 @@ void abort_if_nullptr(T* ptr, const char* err_msg = "") {
 
 int32_t process_event_queue_pairs(const char* event_queue_pairs[],
                                   qeh::QueueList* queue_list);
+
+void handle_all_events(qeh::QueueList* queue_list, int32_t worker_count);

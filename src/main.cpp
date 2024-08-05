@@ -3,6 +3,7 @@
 
 #include "../libqeh/include/queued_event_handler.hpp"
 
+#define WORKER_COUNT 10
 int main() {
   const char* event_queue_pairs[] = {
       "q1\0hi there!",
@@ -12,6 +13,7 @@ int main() {
       "q1\0yes!",
       "q1\0alright!",
       "gooood\0this is a longer message.",
+      "q1\0this is a test.",
       nullptr,
   };
 
@@ -22,6 +24,10 @@ int main() {
             << std::endl;
 
   queue_list->print_queues();
+
+  std::cout << "****************" << std::endl;
+
+  handle_all_events(queue_list.get(), WORKER_COUNT);
 
   return EXIT_SUCCESS;
 }
