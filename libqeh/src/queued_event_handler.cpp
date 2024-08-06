@@ -93,6 +93,8 @@ qeh::Event* qeh::Queue::add_event_to_queue(const char* event_queue_pair) {
 
 int32_t process_event_queue_pairs(const char* event_queue_pairs[],
                                   qeh::QueueList* queue_list) {
+  abort_if_nullptr(queue_list, "Received null as queue list ptr.");
+  abort_if_nullptr(event_queue_pairs, "Received null as input ptr.");
   int events_added{0};
   while (*event_queue_pairs) {
     qeh::Queue* corresponding_queue{
