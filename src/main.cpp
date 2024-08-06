@@ -1,7 +1,7 @@
 #include <cstdlib>
 #include <memory>
 
-#include "../libqeh/include/queued_event_handler.hpp"
+#include "queued_event_handler.hpp"
 
 #define WORKER_COUNT 10
 int main() {

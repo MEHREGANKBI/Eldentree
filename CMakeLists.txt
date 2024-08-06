@@ -7,6 +7,7 @@ project(Eldentree VERSION 1.0.0)
 add_subdirectory(libqeh/)
 
 add_executable(${CMAKE_PROJECT_NAME} src/main.cpp)
+target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE libqeh/include/)
 target_link_libraries(${CMAKE_PROJECT_NAME} qeh)
 
 add_subdirectory(tests/)
