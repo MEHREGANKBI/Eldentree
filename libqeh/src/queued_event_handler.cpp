@@ -166,7 +166,7 @@ void default_worker_handler(qeh::QueueList* queue_list, int32_t thread_id) {
       current_queue = current_queue->next;
     }
     qeh_lock.unlock();
-    std::this_thread::sleep_for(std::chrono::milliseconds(234));
+    std::this_thread::sleep_for(std::chrono::milliseconds(20));
   }
 }
 
