@@ -1,8 +1,15 @@
 #pragma once
+#include <cstdint>
 #include <iostream>
 #include <string>
 
 namespace qeh {
+
+template <typename T>
+struct ErrOr {
+  int32_t no_errors{};
+  T* value;
+};
 
 struct Event {
   std::string message{};
