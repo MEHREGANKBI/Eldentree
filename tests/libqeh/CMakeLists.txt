@@ -20,4 +20,4 @@ target_link_libraries(
     qeh)
 
 
-add_test(libqeh_test_process_eqp test_process_event_queue_pairs)
+add_test(libqeh_test_process_eqp test_process_eqp)
