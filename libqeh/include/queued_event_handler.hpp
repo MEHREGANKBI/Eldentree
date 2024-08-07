@@ -3,12 +3,14 @@
 #include <iostream>
 #include <string>
 
+#define FATAL_ERROR -1
+
 namespace qeh {
 
 template <typename T>
 struct ErrOr {
-  int32_t no_errors{};
-  T* value;
+  bool error{};
+  T* value{};
 };
 
 struct Event {
@@ -22,7 +24,7 @@ struct Queue {
   Event* last_event{nullptr};
   Queue* next{nullptr};
 
-  qeh::Event* add_event_to_queue(const char* event_queue_pair);
+  ErrOr<Event> add_event_to_queue(const char* event_queue_pair);
   void print_events() const;
 };
 
@@ -30,8 +32,8 @@ struct QueueList {
   Queue* first{nullptr};
   Queue* last{nullptr};
 
-  Queue* queue_exists(const char* event_queue_pair) const;
-  qeh::Queue* create_new_queue(const char* queue_name);
+  ErrOr<Queue> queue_exists(const char* event_queue_pair) const;
+  ErrOr<Queue> create_new_queue(const char* queue_name);
   void print_queues() const;
 };
 
@@ -48,4 +50,4 @@ void abort_if_nullptr(T* ptr, const char* err_msg = "") {
 int32_t process_event_queue_pairs(const char* event_queue_pairs[],
                                   qeh::QueueList* queue_list);
 
-void handle_all_events(qeh::QueueList* queue_list, int32_t worker_count);
+int32_t handle_all_events(qeh::QueueList* queue_list, int32_t worker_count);
