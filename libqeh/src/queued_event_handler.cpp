@@ -19,15 +19,18 @@ qeh::ErrOr<qeh::Queue> qeh::QueueList::queue_exists(
     std::cerr << "Null event queue pair received.";
     return ErrOr<Queue>{true};
   }
-  // Invalid state and thus not recoverable.
-  if ((this->first == nullptr) || (this->last == nullptr)) {
-    std::cerr << "Only first member or only last member of queuelist is null!";
-    return ErrOr<Queue>{true};
-  }
 
   std::cout << event_queue_pair << std::endl;
   if ((this->first == nullptr) && (this->last == nullptr)) {
     return ErrOr<Queue>{false};
+  }
+
+  // Invalid state and thus not recoverable.
+  // basically since the code didn't enter the && above,
+  // the OR condition below acts as XOR.
+  if ((this->first == nullptr) || (this->last == nullptr)) {
+    std::cerr << "Only first member or only last member of queuelist is null!";
+    return ErrOr<Queue>{true};
   }
 
   Queue* current_queue{this->first};
@@ -123,7 +126,7 @@ qeh::ErrOr<qeh::Event> qeh::Queue::add_event_to_queue(
 int32_t process_event_queue_pairs(const char* event_queue_pairs[],
                                   qeh::QueueList* queue_list) {
   if ((!event_queue_pairs) || (!queue_list)) {
-    return EXIT_FAILURE;
+    return FATAL_ERROR;
   }
 
   int events_added{0};
@@ -132,7 +135,7 @@ int32_t process_event_queue_pairs(const char* event_queue_pairs[],
         queue_list->queue_exists(*event_queue_pairs)};
     qeh::Queue* corresponding_queue{};
     if (queue_lookup_status.error) {
-      continue;
+      return FATAL_ERROR;
     }
     corresponding_queue = queue_lookup_status.value;
 
@@ -142,7 +145,7 @@ int32_t process_event_queue_pairs(const char* event_queue_pairs[],
           queue_list->create_new_queue(*event_queue_pairs)};
       if (queue_create_status.error) {
         std::cerr << "queue creation failed.";
-        return EXIT_FAILURE;
+        return FATAL_ERROR;
       }
       corresponding_queue = queue_create_status.value;
     }
@@ -151,7 +154,7 @@ int32_t process_event_queue_pairs(const char* event_queue_pairs[],
         corresponding_queue->add_event_to_queue(*event_queue_pairs)};
     if (event_create_status.error) {
       std::cerr << "Couldn't create event.";
-      return EXIT_FAILURE;
+      return FATAL_ERROR;
     }
     events_added += 1;
     // move to the next input from pair.
@@ -212,7 +215,7 @@ int32_t default_worker_handler(qeh::QueueList* queue_list, int32_t thread_id) {
       current_queue = current_queue->next;
     }
     qeh_lock.unlock();
-    std::this_thread::sleep_for(std::chrono::milliseconds(20));
+    std::this_thread::sleep_for(std::chrono::milliseconds(5));
   }
   return EXIT_SUCCESS;
 }
