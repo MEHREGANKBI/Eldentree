@@ -1,4 +1,4 @@
-#include "../include/queued_event_handler.hpp"
+#include "queued_event_handler.hpp"
 
 void qeh::Queue::print_events() const {
   Event* current_event{this->first_event};

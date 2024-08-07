@@ -7,3 +7,4 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 project(qeh VERSION 1.0.0)
 
 add_library(${PROJECT_NAME} STATIC src/queued_event_handler.cpp src/supplementary_assets.cpp include/queued_event_handler.hpp)
+target_include_directories(${PROJECT_NAME} PRIVATE include/)
