@@ -30,3 +30,4 @@ build/
 
 # misc
 *.pdf
+.cache/
